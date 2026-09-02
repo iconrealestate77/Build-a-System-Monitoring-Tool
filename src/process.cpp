@@ -11,7 +11,9 @@ using std::string;
 using std::to_string;
 using std::vector;
 
-Process::Process(int pid) : pid_(pid) {}
+Process::Process(int pid) : pid_(pid) {
+  cpuUtilization_ = CpuUtilization();
+}
 
 int Process::Pid() { return pid_; }
 
@@ -20,7 +22,8 @@ float Process::CpuUtilization() {
   long starttime = uptime - LinuxParser::UpTime(pid_);
   long active = LinuxParser::ActiveJiffies(pid_);
   long seconds = starttime > 0 ? starttime : 1;
-  return static_cast<float>(active) / sysconf(_SC_CLK_TCK) / static_cast<float>(seconds);
+  cpuUtilization_ = static_cast<float>(active) / sysconf(_SC_CLK_TCK) / static_cast<float>(seconds);
+  return cpuUtilization_;
 }
 
 string Process::Command() { return LinuxParser::Command(pid_); }
